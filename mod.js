@@ -1,5 +1,12 @@
 import { curry } from "./curry.js";
-import { split, replace, intercalate, toLowerCase, concat } from "./stringy.js";
+import {
+  split,
+  replace,
+  intercalate,
+  toLowerCase,
+  concat,
+  append,
+} from "./stringy.js";
 import { add } from "./numbers.js";
 import { reduce, map, sortBy } from "./arrays.js";
 import { prop } from "./objects.js";
@@ -16,6 +23,7 @@ export {
   prop,
   add,
   concat,
+  append,
 };
 
 const l = console.log;
@@ -127,7 +135,7 @@ function ex_ch5() {
     return concat(fastest.name, " is the fastest");
   };
   const $fastestCar = compose(
-    (name) => concat(name, " is the fastest"),
+    append(" is the fastest"),
     prop("name"),
     last,
     sortBy(prop("horsepower")),

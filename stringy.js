@@ -1,4 +1,5 @@
 import { curry } from "./curry.js";
+import { flip } from "./funcs.js";
 export {
   split,
   match,
@@ -8,6 +9,7 @@ export {
   toString,
   toUpperCase,
   concat,
+  append,
 };
 // split :: String -> String -> [String]
 const split = curry((sep, str) => str.split(sep));
@@ -32,3 +34,6 @@ const toUpperCase = (s) => s.toUpperCase();
 
 // concat :: String -> String -> String
 const concat = curry((a, b) => a.concat(b));
+
+// append :: String -> String -> String
+const append = flip(concat);
