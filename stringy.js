@@ -7,6 +7,7 @@ export {
   toLowerCase,
   toString,
   toUpperCase,
+  concat,
 };
 // split :: String -> String -> [String]
 const split = curry((sep, str) => str.split(sep));
@@ -28,3 +29,6 @@ const toLowerCase = (s) => s.toLowerCase();
 
 // toUpperCase :: String -> String
 const toUpperCase = (s) => s.toUpperCase();
+
+// concat :: String -> String -> String
+const concat = curry((a, b) => a.concat(b));

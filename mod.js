@@ -1,6 +1,8 @@
 import { curry } from "./curry.js";
-import { split, replace, intercalate, toLowerCase } from "./stringy.js";
-import { reduce, map } from "./arrays.js";
+import { split, replace, intercalate, toLowerCase, concat } from "./stringy.js";
+import { add } from "./numbers.js";
+import { reduce, map, sortBy } from "./arrays.js";
+import { prop } from "./objects.js";
 import { compose, pipe } from "./funcs.js";
 export {
   curry,
@@ -11,6 +13,9 @@ export {
   replace,
   intercalate,
   toLowerCase,
+  prop,
+  add,
+  concat,
 };
 
 const l = console.log;
@@ -64,6 +69,7 @@ function ex_ch5() {
 
   l(dasherize("The world is a vampire"));
   // after split [ 'The', 'world', 'is', 'a', 'vampire' ]
+
   // We consider Car objects of the following shape:
   //   {
   //     name: 'Aston Martin One-77',
@@ -75,25 +81,59 @@ function ex_ch5() {
 
   const cars = [
     {
-      name: 'Aston Martin One-77',
+      name: "Aston Martin One-77",
       horsepower: 750,
       dollar_value: 1850000,
       in_stock: true,
     },
     {
-      name: 'Another Car',
+      name: "Another Car",
       horsepower: 300,
       dollar_value: 10000,
       in_stock: false,
-    }];
+    },
+  ];
   // isLastInStock :: [Car] -> Boolean
   const isLastInStock = (cars) => {
     const lastCar = last(cars);
-    return prop('in_stock', lastCar);
+    return prop("in_stock", lastCar);
   };
-  const $isLastInStock=0
+  const $isLastInStock = compose(prop("in_stock"), last);
   l(isLastInStock(cars));
   l($isLastInStock(cars));
+  l(isLastInStock(reverse(cars)));
+  l($isLastInStock(reverse(cars)));
+
+  // Considering the following function:
+  //   const average = xs => reduce(add, 0, xs) / xs.length;
+  // Use the helper function `average` to refactor `averageDollarValue` as a composition.
+
+  const average = (xs) => reduce(add, 0, xs) / xs.length;
+  // averageDollarValue :: [Car] -> Int
+  const averageDollarValue = (cars) => {
+    const dollarValues = map((c) => c.dollar_value, cars);
+    return average(dollarValues);
+  };
+  const $averageDollarValue = compose(average, map(prop("dollar_value")));
+  l(averageDollarValue(cars));
+  l($averageDollarValue(cars));
+
+  // Refactor `fastestCar` using `compose()` and other functions in pointfree-style.
+
+  // fastestCar :: [Car] -> String
+  const fastestCar = (cars) => {
+    const sorted = sortBy((car) => car.horsepower, cars);
+    const fastest = last(sorted);
+    return concat(fastest.name, " is the fastest");
+  };
+  const $fastestCar = compose(
+    (name) => concat(name, " is the fastest"),
+    prop("name"),
+    last,
+    sortBy(prop("horsepower")),
+  );
+  l(fastestCar(cars));
+  l($fastestCar(cars));
 }
 
 function ex_ch4() {

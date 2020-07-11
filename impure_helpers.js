@@ -1,6 +1,6 @@
 import { curry } from "./curry.js";
 export {
-  trace 
+  trace,
 };
 
 const trace = curry((tag, x) => {
