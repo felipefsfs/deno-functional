@@ -4,6 +4,7 @@ export {
   last,
   map,
   reduce,
+  reverse,
 };
 // filter :: (a -> Boolean) -> [a] -> [a]
 const filter = curry((fn, xs) => xs.filter(fn));
@@ -16,3 +17,6 @@ const map = curry((fn, f) => f.map(fn));
 
 // reduce :: (b -> a -> b) -> b -> [a] -> b
 const reduce = curry((fn, zero, xs) => xs.reduce(fn, zero));
+
+// reverse :: [a, b, c] -> [c, b ,a]
+const reverse = reduce((acc, x) => [x, ...acc], []);

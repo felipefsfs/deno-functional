@@ -1,16 +1,101 @@
 import { curry } from "./curry.js";
-import { split } from "./stringy.js";
-import { reduce } from "./arrays.js";
+import { split, replace, intercalate, toLowerCase } from "./stringy.js";
+import { reduce, map } from "./arrays.js";
+import { compose, pipe } from "./funcs.js";
 export {
   curry,
   split,
   reduce,
+  compose,
+  map,
+  replace,
+  intercalate,
+  toLowerCase,
 };
 
 const l = console.log;
 if (import.meta.main) {
-  ex_ch4();
+  ex_ch5();
+  //ex_ch4();
 }
+
+function ex_ch5() {
+  const toUpperCase = (x) => x.toUpperCase();
+  const exclaim = (x) => `${x}!`;
+  const shout = compose(exclaim, toUpperCase);
+
+  l(shout("send in the clowns")); // "SEND IN THE CLOWNS!"
+  const head = (x) => x[0];
+  const reverse = reduce((acc, x) => [x, ...acc], []);
+  const last = compose(head, reverse);
+
+  l(last(["jumpkick", "roundhouse", "uppercut"])); // 'uppercut'
+
+  // previously we'd have to write two composes, but since it's associative,
+  // we can give compose as many fn's as we like and let it decide how to group them.
+  const arg = ["jumpkick", "roundhouse", "uppercut"];
+  const lastUpper = compose(toUpperCase, head, reverse);
+  const loudLastUpper = compose(exclaim, toUpperCase, head, reverse);
+
+  l(lastUpper(arg)); // 'UPPERCUT'
+  l(loudLastUpper(arg)); // 'UPPERCUT!'
+
+  // pointfree
+  // NOTE: we use 'intercalate' from the appendix instead of 'join' introduced in Chapter 09!
+  const initials = compose(
+    intercalate(". "),
+    map(compose(toUpperCase, head)),
+    split(" "),
+  );
+
+  l(initials("hunter stockton thompson")); // 'H. S. T'
+
+  const trace = curry((tag, x) => {
+    console.log("T >>", tag, ">>", x);
+    return x;
+  });
+  const dasherize = compose(
+    intercalate("-"),
+    map(toLowerCase),
+    trace("after split"),
+    split(" "),
+    replace(/\s{2,}/ig, " "),
+  );
+
+  l(dasherize("The world is a vampire"));
+  // after split [ 'The', 'world', 'is', 'a', 'vampire' ]
+  // We consider Car objects of the following shape:
+  //   {
+  //     name: 'Aston Martin One-77',
+  //     horsepower: 750,
+  //     dollar_value: 1850000,
+  //     in_stock: true,
+  //   }
+  // Use `compose()` to rewrite the function below.
+
+  const cars = [
+    {
+      name: 'Aston Martin One-77',
+      horsepower: 750,
+      dollar_value: 1850000,
+      in_stock: true,
+    },
+    {
+      name: 'Another Car',
+      horsepower: 300,
+      dollar_value: 10000,
+      in_stock: false,
+    }];
+  // isLastInStock :: [Car] -> Boolean
+  const isLastInStock = (cars) => {
+    const lastCar = last(cars);
+    return prop('in_stock', lastCar);
+  };
+  const $isLastInStock=0
+  l(isLastInStock(cars));
+  l($isLastInStock(cars));
+}
+
 function ex_ch4() {
   const match = curry((what, s) => s.match(what));
   const replace = curry((what, replacement, s) => s.replace(what, replacement));
@@ -54,5 +139,4 @@ function ex_ch4() {
   const $max = reduce(keepHighest, -Infinity);
   l(max([1, 4, 7, 9, 3, 0]));
   l($max([1, 4, 7, 9, 3, 0]));
-  
 }
